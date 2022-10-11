@@ -67,7 +67,7 @@ def main(args, configs):
     save_step = train_config["step"]["save_step"]
     synth_step = train_config["step"]["synth_step"]
     val_step = train_config["step"]["val_step"]
-
+    val_loss = 25042001
     outer_bar = tqdm(total=total_step, desc="Training", position=0)
     outer_bar.n = args.restore_step
     outer_bar.update()
@@ -141,17 +141,33 @@ def main(args, configs):
 
                 if step % val_step == 0:
                     model.eval()
-                    message = evaluate(model, step, configs, val_logger, vocoder)
+                    message, loss = evaluate(model, step, configs, val_logger, vocoder)
                     with open(os.path.join(val_log_path, "log.txt"), "a") as f:
                         f.write(message + "\n")
                     outer_bar.write(message)
 
                     model.train()
 
+                    if (loss[1]+loss[2])/2 <= val_loss:
+                        val_loss = (loss[1]+loss[2])/2
+                        torch.save(
+                        {
+                            "model": model.state_dict(),
+                            "optimizer": optimizer._optimizer.state_dict(),
+                        },
+                        os.path.join(
+                            train_config["path"]["ckpt_path"],
+                            "{}.pth.tar".format(step),
+                        ),
+                        )
+                        outer_bar.write("Checkpoint saved at step %d" % step)
+
+
+
                 if step % save_step == 0:
                     torch.save(
                         {
-                            "model": model.module.state_dict(),
+                            "model": model.state_dict(),
                             "optimizer": optimizer._optimizer.state_dict(),
                         },
                         os.path.join(

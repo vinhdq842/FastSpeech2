@@ -83,7 +83,7 @@ def evaluate(model, step, configs, logger=None, vocoder=None):
             tag="Validation/step_{}_{}_synthesized".format(step, tag),
         )
 
-    return message
+    return message,loss_means
 
 
 if __name__ == "__main__":
