@@ -40,9 +40,24 @@ class FastSpeech2(nn.Module):
                 model_config["transformer"]["encoder_hidden"],
             )
 
+        self.emotion_emb = None
+        if model_config["multi_emotion"]:
+            with open(
+                os.path.join(
+                    preprocess_config["path"]["preprocessed_path"], "emotions.json"
+                ),
+                "r",
+            ) as f:
+                n_emotion = len(json.load(f))
+            self.emotion_emb = nn.Embedding(
+                n_emotion,
+                model_config["transformer"]["encoder_hidden"],
+            )
+
     def forward(
         self,
         speakers,
+        emotions,
         texts,
         src_lens,
         max_src_len,
@@ -56,6 +71,7 @@ class FastSpeech2(nn.Module):
         e_control=1.0,
         d_control=1.0,
     ):
+
         src_masks = get_mask_from_lengths(src_lens, max_src_len)
         mel_masks = (
             get_mask_from_lengths(mel_lens, max_mel_len)
@@ -67,6 +83,11 @@ class FastSpeech2(nn.Module):
 
         if self.speaker_emb is not None:
             output = output + self.speaker_emb(speakers).unsqueeze(1).expand(
+                -1, max_src_len, -1
+            )
+
+        if self.emotion_emb is not None:
+            output = output + self.emotion_emb(emotions).unsqueeze(1).expand(
                 -1, max_src_len, -1
             )
 

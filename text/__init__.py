@@ -35,7 +35,7 @@ def text_to_sequence(text, cleaner_names):
             sequence += _symbols_to_sequence(_clean_text(text, cleaner_names))
             break
         sequence += _symbols_to_sequence(_clean_text(m.group(1), cleaner_names))
-        sequence += _arpabet_to_sequence(m.group(2))
+        sequence += _mfa_to_sequence(m.group(2))
         text = m.group(3)
 
     return sequence
@@ -67,7 +67,7 @@ def _symbols_to_sequence(symbols):
     return [_symbol_to_id[s] for s in symbols if _should_keep_symbol(s)]
 
 
-def _arpabet_to_sequence(text):
+def _mfa_to_sequence(text):
     return _symbols_to_sequence(["@" + s for s in text.split()])
 
 

@@ -44,7 +44,7 @@ def get_vocoder(config, device):
     speaker = config["vocoder"]["speaker"]
 
     if name == "MelGAN":
-        if speaker == "LJSpeech":
+        if speaker == "VLSP":
             vocoder = torch.hub.load(
                 "descriptinc/melgan-neurips", "load_melgan", "linda_johnson"
             )
@@ -59,7 +59,7 @@ def get_vocoder(config, device):
             config = json.load(f)
         config = hifigan.AttrDict(config)
         vocoder = hifigan.Generator(config)
-        if speaker == "LJSpeech":
+        if speaker == "VLSP":
             ckpt = torch.load("hifigan/generator_LJSpeech.pth.tar")
         elif speaker == "universal":
             ckpt = torch.load("hifigan/generator_universal.pth.tar")

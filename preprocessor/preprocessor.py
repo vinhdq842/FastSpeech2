@@ -21,6 +21,7 @@ class Preprocessor:
         self.val_size = config["preprocessing"]["val_size"]
         self.sampling_rate = config["preprocessing"]["audio"]["sampling_rate"]
         self.hop_length = config["preprocessing"]["stft"]["hop_length"]
+        self.emotions = json.load(open(os.path.join(self.in_dir, "emotions.json")))
 
         assert config["preprocessing"]["pitch"]["feature"] in [
             "phoneme_level",
@@ -31,10 +32,10 @@ class Preprocessor:
             "frame_level",
         ]
         self.pitch_phoneme_averaging = (
-            config["preprocessing"]["pitch"]["feature"] == "phoneme_level"
+                config["preprocessing"]["pitch"]["feature"] == "phoneme_level"
         )
         self.energy_phoneme_averaging = (
-            config["preprocessing"]["energy"]["feature"] == "phoneme_level"
+                config["preprocessing"]["energy"]["feature"] == "phoneme_level"
         )
 
         self.pitch_normalization = config["preprocessing"]["pitch"]["normalization"]
@@ -64,7 +65,8 @@ class Preprocessor:
 
         # Compute pitch, energy, duration, and mel-spectrogram
         speakers = {}
-        for i, speaker in enumerate(tqdm(os.listdir(self.in_dir))):
+        for i, speaker in enumerate(
+                tqdm([d for d in os.listdir(self.in_dir) if os.path.isdir(os.path.join(self.in_dir, d))])):
             speakers[speaker] = i
             for wav_name in os.listdir(os.path.join(self.in_dir, speaker)):
                 if ".wav" not in wav_name:
@@ -72,8 +74,11 @@ class Preprocessor:
 
                 basename = wav_name.split(".")[0]
                 tg_path = os.path.join(
-                    self.out_dir, "TextGrid", speaker, "{}.TextGrid".format(basename)
+                    self.out_dir, speaker, "{}.TextGrid".format(basename)
                 )
+                pitch = []
+                energy = []
+                n = 0
                 if os.path.exists(tg_path):
                     ret = self.process_utterance(speaker, basename)
                     if ret is None:
@@ -116,6 +121,10 @@ class Preprocessor:
         with open(os.path.join(self.out_dir, "speakers.json"), "w") as f:
             f.write(json.dumps(speakers))
 
+        with open(os.path.join(self.out_dir, "emotions.json"), "w") as f:
+            e = set(self.emotions.values())
+            f.write(json.dumps({k: v for k, v in zip(e, range(len(e)))}))
+
         with open(os.path.join(self.out_dir, "stats.json"), "w") as f:
             stats = {
                 "pitch": [
@@ -144,7 +153,7 @@ class Preprocessor:
 
         # Write metadata
         with open(os.path.join(self.out_dir, "train.txt"), "w", encoding="utf-8") as f:
-            for m in out[self.val_size :]:
+            for m in out[self.val_size:]:
                 f.write(m + "\n")
         with open(os.path.join(self.out_dir, "val.txt"), "w", encoding="utf-8") as f:
             for m in out[: self.val_size]:
@@ -156,7 +165,7 @@ class Preprocessor:
         wav_path = os.path.join(self.in_dir, speaker, "{}.wav".format(basename))
         text_path = os.path.join(self.in_dir, speaker, "{}.lab".format(basename))
         tg_path = os.path.join(
-            self.out_dir, "TextGrid", speaker, "{}.TextGrid".format(basename)
+            self.out_dir, speaker, "{}.TextGrid".format(basename)
         )
 
         # Get alignments
@@ -171,8 +180,8 @@ class Preprocessor:
         # Read and trim wav files
         wav, _ = librosa.load(wav_path)
         wav = wav[
-            int(self.sampling_rate * start) : int(self.sampling_rate * end)
-        ].astype(np.float32)
+              int(self.sampling_rate * start): int(self.sampling_rate * end)
+              ].astype(np.float32)
 
         # Read raw text
         with open(text_path, "r") as f:
@@ -210,7 +219,7 @@ class Preprocessor:
             pos = 0
             for i, d in enumerate(duration):
                 if d > 0:
-                    pitch[i] = np.mean(pitch[pos : pos + d])
+                    pitch[i] = np.mean(pitch[pos: pos + d])
                 else:
                     pitch[i] = 0
                 pos += d
@@ -221,7 +230,7 @@ class Preprocessor:
             pos = 0
             for i, d in enumerate(duration):
                 if d > 0:
-                    energy[i] = np.mean(energy[pos : pos + d])
+                    energy[i] = np.mean(energy[pos: pos + d])
                 else:
                     energy[i] = 0
                 pos += d
@@ -244,7 +253,7 @@ class Preprocessor:
         )
 
         return (
-            "|".join([basename, speaker, text, raw_text]),
+            "|".join([basename, speaker, text, raw_text, self.emotions[basename]]),
             self.remove_outlier(pitch),
             self.remove_outlier(energy),
             mel_spectrogram.shape[1],
@@ -252,7 +261,7 @@ class Preprocessor:
 
     def get_alignment(self, tier):
         sil_phones = ["sil", "sp", "spn"]
-
+        phucker_phones = ["t̚","k̚","p̚"]
         phones = []
         durations = []
         start_time = 0
@@ -261,6 +270,8 @@ class Preprocessor:
         for t in tier._objects:
             s, e, p = t.start_time, t.end_time, t.text
 
+            if p in phucker_phones:
+                continue
             # Trim leading silences
             if phones == []:
                 if p in sil_phones:

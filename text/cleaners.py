@@ -12,11 +12,12 @@ hyperparameter. Some cleaners are English-specific. You'll typically want to use
      the symbols in symbols.py to match your data).
 '''
 
-
 # Regular expression matching whitespace:
 import re
 from unidecode import unidecode
 from .numbers import normalize_numbers
+import unicodedata
+
 _whitespace_re = re.compile(r'\s+')
 
 # List of (regular expression, replacement) pairs for abbreviations:
@@ -86,4 +87,12 @@ def english_cleaners(text):
     text = expand_numbers(text)
     text = expand_abbreviations(text)
     text = collapse_whitespace(text)
+    return text
+
+
+def vietnamese_cleaners(text: str):
+    text = lowercase(text)
+    text = unicodedata.normalize('NFC',text)
+    text = collapse_whitespace(text)
+
     return text
