@@ -1,0 +1,5 @@
+python prepare_align.py config/VLSP/preprocess.yaml
+mfa validate raw_data/VLSP/ lexicon/vietnamese-hcm-lexicon.txt vietnamese_mfa
+mfa align raw_data/VLSP/ lexicon/vietnamese-hcm-lexicon.txt vietnamese_mfa preprocessed_data/VLSP
+python preprocess.py config/VLSP/preprocess.yaml
+python synthesize.py --mode single -p config/VLSP/preprocess.yaml -m config/VLSP/model.yaml -t config/VLSP/train.yaml --text "cuộc sống này quá bon chen" --restore_step 30000 --emotion_id 1

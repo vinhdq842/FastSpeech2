@@ -4808,3 +4808,146 @@ yểu	ʔ iː˨˩˦ w
 ừm	ʔ ɨ˨˩ m
 ửng	ʔ ɨ˨˩˦ ŋ
 ực	ʔ ɨ˨˩˨ k
+ã	ʔ aː˨˩˦
+é	ʔ ɛː˦˥
+è	ʔ ɛː˨˩
+ẻ	ʔ ɛː˨˩˦
+ẽ	ʔ ɛː˨˩˦
+ề	ʔ eː˨˩
+ể	ʔ eː˨˩˦
+ễ	ʔ eː˨˩˦
+ệ	ʔ eː˨˩˨
+ỉ	ʔ i˨˩˦
+ò	ʔ ɔː˨˩
+ỏ	ʔ ɔː˨˩˦
+õ	ʔ ɔː˨˩˦
+ọ	ʔ ɔː˨˩˨
+ố	ʔ oː˦˥
+ỗ	ʔ oː˨˩˦
+ộ	ʔ oː˨˩˨
+ỡ	ʔ əː˨˩˦
+ũ	ʔ u˨˩˦
+ử	ʔ ɨ˨˩˦
+ữ	ʔ ɨ˨˩˦
+ự	ʔ ɨ˨˩˨
+ỳ	ʔ i˨˩
+ỷ	ʔ i˨˩˦
+ỹ	ʔ i˨˩˦
+ỵ	ʔ i˨˩˨
+b	ɓ əː˨˩
+c	k əː˨˩
+d	j əː˨˩
+đ	ɗ əː˨˩
+g	ɡ əː˨˩
+h	h əː˨˩
+k	k aː˨˨
+l	l əː˨˩
+m	m əː˨˩
+n	n əː˨˩
+p	p əː˨˩
+q	k əː˨˩
+r	r əː˨˩
+s	s əː˨˩
+t	t əː˨˩
+v	v əː˨˩
+x	s əː˨˩
+ch	c əː˨˩
+gh	ɡ əː˨˩
+gi	j əː˨˩
+kh	x əː˨˩
+ng	ŋ əː˨˩
+ngh	ŋ əː˨˩
+nh	ɲ əː˨˩
+th	tʰ əː˨˩
+tr	ʈ əː˨˩
+qu	w əː˨˩
+hiều	h iː˨˩ w
+đản	ɗ aː˨˩˦ ŋ
+ẹc	ɛː˨˩˨ k
+rụp	r ɨ˨˩˨ p
+dợ	j əː˨˩˨
+re	r ɛː˨˨
+dặt	j a˨˩˨ k
+dẹo	j ɛː˨˩˨ w
+ting	t ɨ˨˨ n
+sạo	s aː˨˩˨ w
+năn	n a˨˨ ŋ
+lèm	l ɛː˨˩ m
+bèm	ɓ ɛː˨˩ m
+cút	k u˦˥ kp
+phung	f u˨˨ ŋ
+nhò	ɲ ɔː˨˩
+hừm	h ɨ˨˩ m
+thẫn	tʰ ə˨˩˦ ŋ
+nà	n aː˨˩
+quều	w eː˨˩ w
+bóng	ɓ ɔ˦˥ ŋm
+nhẹt	ɲ ɛː˨˩˨ k
+ắc	a˦˥ k
+quắc	w a˦˥ k
+queo	w ɛː˨˨ w
+trẽn	ʈ ɛː˨˩˦ ŋ
+mèn	m ɛː˨˩ ŋ
+khè	x ɛː˨˩
+bặm	ɓ a˨˩˨ m
+tửng	t ɨ˨˩˦ ŋ
+đặn	ɗ a˨˩˨ ŋ
+năn	n a˨˨ ŋ
+áy	a˦˥ j
+náy	n a˦˥ j
+ợt	əː˨˩˨ k
+quặc	w a˨˩˨ k
+xìu	s i˨˩ w
+phiêu	f iː˨˨ w
+xùm	s ɨ˨˩ m
+lổng	l ɔ˨˩˦ ŋm
+din	j ɨ˨˨ n
+sàm	s aː˨˩ m
+sỡ	s əː˨˩˦
+quác	w aː˦˥ k
+hợt	h əː˨˩˨ k
+von	v ɔː˨˨ ŋ
+reng	r ɛː˨˨ ŋ
+sếch	s əː˦˥ t
+lum	l ɨ˨˨ m
+tùm	t ɨ˨˩ m
+ùm	ɨ˨˩ m
+xòm	s ɔː˨˩ m
+hoác	h w aː˦˥ k
+quạn	w a˨˩˨ ŋ
+quờ	w uː˨˩
+phóc	f ɔ˦˥ kp
+te	t ɛː˨˨
+hứ	h ɨ˦˥
+quẳng	w a˨˩˦ ŋ
+sóp	s ɔː˦˥ p
+sịt	s ɨ˨˩˨ t
+béc	ɓ ɛː˦˥ k
+lin	l ɨ˨˨ ŋ
+rón	r ɔː˦˥ ŋ
+uế 	w eː˦˥
+nghiễm	ŋ iː˨˩˦ m
+xẹt	s ɛː˨˩˨ k
+ẹo	ɛː˨˩˨ w
+phiếc	f iː˦˥ k
+tèo	t ɛː˨˩ w
+bing	ɓ ɨ˨˨ n
+tành	t a˨˩ n
+ời	əː˨˩ j
+nham	ɲ aː˨˨ m
+chèm	c ɛː˨˩ m
+hì	h i˨˩
+day	j a˨˨ j
+ưm	ɨ˨˨ m
+nhem	ɲ ɛː˨˨ m
+gổ 	ɡ oː˨˩˦
+quài	w aː˨˩ j
+sùm	s ɨ˨˩ m
+sì	s i˨˩
+lảm	l aː˨˩˦ m
+hừ	ɨ˨˩
+mói	m ɔː˦˥ j
+xằng	s a˨˩ ŋ
+nít	n ɨ˦˥ t
+ờm	əː˨˩ m
+um	ɨ˨˨ m

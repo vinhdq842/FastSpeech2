@@ -29,7 +29,7 @@ def prepare_align(config):
             if os.path.exists(wav_path):
                 os.makedirs(os.path.join(out_dir, speaker), exist_ok=True)
                 wav, _ = librosa.load(wav_path, sr=sampling_rate)
-                wav = wav / max(abs(wav)) * max_wav_value
+                wav = wav / np.max(np.abs(wav)) * max_wav_value
                 wavfile.write(
                     os.path.join(out_dir, speaker, "{}.wav".format(base_name)),
                     sampling_rate,

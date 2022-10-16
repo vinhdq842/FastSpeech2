@@ -2,7 +2,7 @@ dataset: "VLSP"
 
 path:
   corpus_path: "/home/altvn/vinhdq/vlsp2022-emo-tts/data/denoised"
-  lexicon_path: "lexicon/vietnamese-hcm-lexicon.txt"
+  lexicon_path: "./lexicon/vietnamese-hcm-lexicon.txt"
   raw_path: "./raw_data/VLSP"
   preprocessed_path: "./preprocessed_data/VLSP"
 

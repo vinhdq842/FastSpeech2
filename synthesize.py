@@ -11,6 +11,7 @@ from utils.model import get_model, get_vocoder
 from utils.tools import to_device, synth_samples
 from dataset import TextDataset
 from text import text_to_sequence
+from unidecode import unidecode
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -33,9 +34,38 @@ def preprocess_vietnamese(text, preprocess_config):
 
     phones = []
     words = re.split(r"([,;.\-\?\!\s+])", text)
+    comb = ["ch","gh","gi","kh","ng","ngh","nh","th","tr","qu"]
+
     for w in words:
-        if w.lower() in lexicon:
-            phones += lexicon[w.lower()]
+        w = w.lower()
+        if w in lexicon:
+            phones += lexicon[w]
+        else:
+            can:bool = True
+
+            for c in w:
+                can = can and c in lexicon
+            
+            if not can:
+                continue
+            
+            if unidecode(w[0]) in ["u","e","o","a","i"]:
+                phones.append(lexicon[w[0]])
+                w = w[len(w[0]):]
+            else:
+                while len(w) > 0:
+                    for cb in comb:
+                        if w.startswith(cb):
+                            phones.append(lexicon[cb].split()[0])
+                            w = w[len(cb):]
+                            break
+                    else:
+                        if unidecode(w[0]) in ["u","e","o","a","i"]:
+                            phones.append(lexicon[w[0]].split()[1:])
+                        else:
+                            phones.append(lexicon[w[0]].split()[0])
+                        w = w[len(w[0]):]
+
 
     phones = "{" + "}{".join(phones) + "}"
     phones = re.sub(r"\{[^\w\s]?\}", "{sp}", phones)

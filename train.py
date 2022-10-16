@@ -25,7 +25,7 @@ def main(args, configs):
 
     # Get dataset
     dataset = Dataset(
-        "train.txt", preprocess_config, train_config, sort=True, drop_last=True
+        "train.txt", preprocess_config, train_config, sort=True, drop_last=False
     )
     batch_size = train_config["optimizer"]["batch_size"]
     group_size = 4  # Set this larger than 1 to enable sorting in Dataset
@@ -42,7 +42,7 @@ def main(args, configs):
 #    model = nn.DataParallel(model)
     num_param = get_param_num(model)
     Loss = FastSpeech2Loss(preprocess_config, model_config).to(device)
-    print("Number of FastSpeech2 Parameters:", num_param)
+    print(f"Number of FastSpeech2 Parameters: {num_param:,}")
 
     # Load vocoder
     vocoder = get_vocoder(model_config, device)
@@ -148,8 +148,8 @@ def main(args, configs):
 
                     model.train()
 
-                    if (loss[1]+loss[2])/2 <= val_loss:
-                        val_loss = (loss[1]+loss[2])/2
+                    if loss[0] <= val_loss:
+                        val_loss = loss[0]
                         torch.save(
                         {
                             "model": model.state_dict(),
@@ -172,7 +172,7 @@ def main(args, configs):
                         },
                         os.path.join(
                             train_config["path"]["ckpt_path"],
-                            "{}.pth.tar".format(step),
+                            "{}-save.pth.tar".format(step),
                         ),
                     )
 
