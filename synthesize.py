@@ -53,20 +53,20 @@ def preprocess_vietnamese(text, preprocess_config):
                 continue
             
             if unidecode(w[0]) in ["u","e","o","a","i"]:
-                phones.append(lexicon[w[0]])
+                phones += lexicon[w[0]]
                 w = w[len(w[0]):]
             else:
                 while len(w) > 0:
                     for cb in comb:
                         if w.startswith(cb):
-                            phones.append(lexicon[cb].split()[0])
+                            phones += lexicon[cb][0]
                             w = w[len(cb):]
                             break
                     else:
                         if unidecode(w[0]) in ["u","e","o","a","i"]:
-                            phones.append(lexicon[w[0]].split()[1:])
+                            phones += lexicon[w[0]][1:]
                         else:
-                            phones.append(lexicon[w[0]].split()[0])
+                            phones += lexicon[w[0]][0]
                         w = w[len(w[0]):]
 
 
