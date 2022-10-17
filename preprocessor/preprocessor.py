@@ -122,7 +122,7 @@ class Preprocessor:
             f.write(json.dumps(speakers))
 
         with open(os.path.join(self.out_dir, "emotions.json"), "w") as f:
-            e = set(self.emotions.values())
+            e = set(self.emotions['speaker1'].values())
             f.write(json.dumps({k: v for k, v in zip(e, range(len(e)))}))
 
         with open(os.path.join(self.out_dir, "stats.json"), "w") as f:
@@ -253,7 +253,7 @@ class Preprocessor:
         )
 
         return (
-            "|".join([basename, speaker, text, raw_text, self.emotions[basename]]),
+            "|".join([basename, speaker, text, raw_text, self.emotions[speaker][basename]]),
             self.remove_outlier(pitch),
             self.remove_outlier(energy),
             mel_spectrogram.shape[1],

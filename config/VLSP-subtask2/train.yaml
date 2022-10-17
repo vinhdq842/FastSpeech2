@@ -1,7 +1,7 @@
 path:
-  ckpt_path: "./output/ckpt/VLSP-full"
-  log_path: "./output/log/VLSP-full"
-  result_path: "./output/result/VLSP-full"
+  ckpt_path: "./output/ckpt/VLSP-subtask2"
+  log_path: "./output/log/VLSP-subtask2"
+  result_path: "./output/result/VLSP-subtask2"
 optimizer:
   batch_size: 16
   betas: [0.9, 0.98]

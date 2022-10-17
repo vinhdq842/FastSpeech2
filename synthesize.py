@@ -1,17 +1,20 @@
+import os
 import re
 import argparse
 from string import punctuation
+import time
 
 import torch
 import yaml
 import numpy as np
 from torch.utils.data import DataLoader
 
-from utils.model import get_model, get_vocoder
+from utils.model import get_model, get_vocoder, vocoder_infer
 from utils.tools import to_device, synth_samples
 from dataset import TextDataset
 from text import text_to_sequence
 from unidecode import unidecode
+from scipy.io import wavfile
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -33,7 +36,7 @@ def preprocess_vietnamese(text, preprocess_config):
     lexicon = read_lexicon(preprocess_config["path"]["lexicon_path"])
 
     phones = []
-    words = re.split(r"([,;.\-\?\!\s+])", text)
+    words = list(filter(lambda x : len(x.strip()) > 0,re.split(r"([,;.\-\?\!\s+])", text)))
     comb = ["ch","gh","gi","kh","ng","ngh","nh","th","tr","qu"]
 
     for w in words:
@@ -81,6 +84,36 @@ def preprocess_vietnamese(text, preprocess_config):
 
     return np.array(sequence)
 
+def synthesize2(model,configs,vocoder,batchs,control_values,path):
+    preprocess_config, model_config, train_config = configs
+    pitch_control, energy_control, duration_control = control_values
+    results = []
+
+    for batch in batchs:
+        batch = to_device(batch, device)
+        with torch.no_grad():
+            # Forward
+            output = model(
+                *(batch[2:]),
+                p_control=pitch_control,
+                e_control=energy_control,
+                d_control=duration_control
+            )
+            
+        mel_predictions = output[1].transpose(1, 2)
+        lengths = output[9] * preprocess_config["preprocessing"]["stft"]["hop_length"]
+        wav_predictions = vocoder_infer(
+            mel_predictions, vocoder, model_config, preprocess_config, lengths=lengths
+        )
+
+        sampling_rate = preprocess_config["preprocessing"]["audio"]["sampling_rate"]
+
+        for wav in wav_predictions:
+            name = os.path.join(path,str(time.time()*1000).split('.')[0] + ".wav")
+            results.append(name)
+            wavfile.write(name, sampling_rate, wav)
+
+    return results
 
 def synthesize(model, step, configs, vocoder, batchs, control_values):
     preprocess_config, model_config, train_config = configs

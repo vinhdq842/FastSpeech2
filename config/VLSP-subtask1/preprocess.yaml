@@ -1,10 +1,10 @@
-dataset: "VLSP"
+dataset: "VLSP-subtask1"
 
 path:
-  corpus_path: "/home/altvn/vinhdq/vlsp2022-emo-tts/data/denoised"
+  corpus_path: "/home/altvn/vinhdq/vlsp2022-emo-tts/data/subtask1"
   lexicon_path: "./lexicon/vietnamese-hcm-lexicon.txt"
-  raw_path: "./raw_data/VLSP"
-  preprocessed_path: "./preprocessed_data/VLSP"
+  raw_path: "./raw_data/VLSP-subtask1"
+  preprocessed_path: "./preprocessed_data/VLSP-subtask1"
 
 preprocessing:
   val_size: 512

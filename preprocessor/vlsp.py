@@ -15,17 +15,20 @@ def prepare_align(config):
     sampling_rate = config["preprocessing"]["audio"]["sampling_rate"]
     max_wav_value = config["preprocessing"]["audio"]["max_wav_value"]
     cleaners = config["preprocessing"]["text"]["text_cleaners"]
-    speaker = "Task1"
+    speaker = ""
     emos = {}
     with open(os.path.join(in_dir, "metadata.txt"), encoding="utf-8") as f:
         for line in tqdm(f):
             parts = line.strip().split("\t")
             base_name = parts[0]
-            text = parts[1]
+            speaker = parts[1]
+            if speaker not in emos:
+                emos[speaker] = {}
+            text = parts[2]
             text = _clean_text(text, cleaners)
-            emos[base_name] = parts[2]
+            emos[speaker][base_name] = parts[3]
 
-            wav_path = os.path.join(in_dir, "{}.wav".format(base_name))
+            wav_path = os.path.join(in_dir,speaker, "{}.wav".format(base_name))
             if os.path.exists(wav_path):
                 os.makedirs(os.path.join(out_dir, speaker), exist_ok=True)
                 wav, _ = librosa.load(wav_path, sr=sampling_rate)
