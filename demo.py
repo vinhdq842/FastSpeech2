@@ -15,9 +15,10 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 st.header("Demo emotional TTS")
 text = st.text_input("Enter your text here")
 restore_step = st.slider("Select checkpoint",1000,40000,step=1000)
+speaker = 1 if st.selectbox("Select speaker",["Speaker 1","Speaker 2"]) == "Speaker 1" else 0
 
 if st.button("Submit"):
-    path_to_config = "config/VLSP-subtask1"
+    path_to_config = "config/VLSP-subtask2"
     pitch_control, energy_control, duration_control = 1, 1, 1
     control_values = pitch_control, energy_control, duration_control
 
@@ -46,7 +47,7 @@ if st.button("Submit"):
     vocoder = get_vocoder(model_config, device)
 
     ids = raw_texts = [text]
-    speakers = np.array([0])
+    speakers = np.array([speaker])
     
     emotion_map = json.load(open(os.path.join(preprocess_config["path"]["preprocessed_path"],"emotions.json")))
 

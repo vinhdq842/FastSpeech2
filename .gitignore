@@ -116,3 +116,6 @@ output/
 *.npy
 TextGrid/
 hifigan/*.pth.tar
+demo_output/*.wav
+preprocessed_data
+.idea

@@ -4,3 +4,6 @@ mfa align raw_data/VLSP-subtask1/ lexicon/vietnamese-hcm-lexicon.txt vietnamese_
 python preprocess.py config/VLSP-subtask1/preprocess.yaml
 python train.py -p config/VLSP-subtask1/preprocess.yaml -m config/VLSP-subtask1/model.yaml -t config/VLSP-subtask1/train.yaml
 python synthesize.py --mode single -p config/VLSP-subtask1/preprocess.yaml -m config/VLSP-subtask1/model.yaml -t config/VLSP-subtask1/train.yaml --text "cuộc sống này quá bon chen" --restore_step 40000 --emotion_id 1
+
+task 1: 40k
+task 2: 15k
