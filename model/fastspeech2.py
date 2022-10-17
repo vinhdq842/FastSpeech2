@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from transformer import Encoder, Decoder, PostNet
-from .modules import VarianceAdaptor
+from .modules import VarianceAdaptor, SEBlock
 from utils.tools import get_mask_from_lengths
 
 
@@ -18,6 +18,7 @@ class FastSpeech2(nn.Module):
         self.model_config = model_config
 
         self.encoder = Encoder(model_config)
+        self.se_block = SEBlock(model_config["transformer"]["encoder_hidden"])
         self.variance_adaptor = VarianceAdaptor(preprocess_config, model_config)
         self.decoder = Decoder(model_config)
         self.mel_linear = nn.Linear(
@@ -37,8 +38,11 @@ class FastSpeech2(nn.Module):
                 n_speaker = len(json.load(f))
             self.speaker_emb = nn.Embedding(
                 n_speaker,
-                model_config["transformer"]["encoder_hidden"],
+                model_config["speaker_emotion"]["speaker_embedding_size"],
             )
+
+        self.spk_prj = nn.Linear(model_config["transformer"]["encoder_hidden"] + model_config["speaker_emotion"]["speaker_embedding_size"],
+                                 model_config["transformer"]["encoder_hidden"], bias=False)
 
         self.emotion_emb = None
         if model_config["multi_emotion"]:
@@ -51,8 +55,29 @@ class FastSpeech2(nn.Module):
                 n_emotion = len(json.load(f))
             self.emotion_emb = nn.Embedding(
                 n_emotion,
-                model_config["transformer"]["encoder_hidden"],
+                model_config["speaker_emotion"]["emotion_embedding_size"],
             )
+
+        self.emo_prj = nn.Linear(model_config["speaker_emotion"]["emotion_embedding_size"], model_config["transformer"]["encoder_hidden"], bias=False)
+        self.pre_conv = nn.Sequential(
+            nn.Conv1d(model_config["transformer"]["encoder_hidden"], model_config["transformer"]["encoder_hidden"], 3,
+                      padding=1),
+            nn.ReLU(),
+            nn.Conv1d(model_config["transformer"]["encoder_hidden"], model_config["transformer"]["encoder_hidden"], 5,
+                      padding=2),
+        )
+
+        self.post_conv = nn.Sequential(
+            nn.Conv1d(model_config["transformer"]["encoder_hidden"], model_config["transformer"]["encoder_hidden"], 3,
+                      padding=1),
+            nn.ReLU(),
+            nn.Conv1d(model_config["transformer"]["encoder_hidden"], model_config["transformer"]["encoder_hidden"], 5,
+                      padding=2),
+            nn.Tanh(),
+        )
+
+        self.post_lin = nn.Linear(model_config["transformer"]["encoder_hidden"],
+                                  model_config["transformer"]["encoder_hidden"])
 
     def forward(
         self,
@@ -82,14 +107,19 @@ class FastSpeech2(nn.Module):
         output = self.encoder(texts, src_masks)
 
         if self.speaker_emb is not None:
-            output = output + self.speaker_emb(speakers).unsqueeze(1).expand(
-                -1, max_src_len, -1
-            )
+            output = torch.cat([output, self.speaker_emb(speakers).unsqueeze(1).expand(-1, max_src_len, -1)], dim=-1)
+            output = self.spk_prj(output)
 
         if self.emotion_emb is not None:
-            output = output + self.emotion_emb(emotions).unsqueeze(1).expand(
-                -1, max_src_len, -1
-            )
+            output = output + torch.tanh(self.emo_prj(self.emotion_emb(emotions))).unsqueeze(1).expand(
+                -1, max_src_len, -1)
+
+        output2 = self.pre_conv(output.transpose(1, 2))
+        output2 = self.se_block(output2)
+        output2 = self.post_lin(output2.transpose(1, 2))
+        output2 = self.post_conv(output2.transpose(1, 2))
+
+        output = output + output2.transpose(1, 2)
 
         (
             output,

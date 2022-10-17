@@ -249,6 +249,23 @@ class VariancePredictor(nn.Module):
         return out
 
 
+class SEBlock(nn.Module):
+    def __init__(self, channel, reduction=16):
+        super(SEBlock, self).__init__()
+        self.avg_pool = nn.AdaptiveAvgPool1d(1)
+        self.fc = nn.Sequential(
+            nn.Linear(channel, channel // reduction, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Linear(channel // reduction, channel, bias=False),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        b, c, _ = x.size()
+        xt = self.avg_pool(x).view(b, c)
+        xt = self.fc(xt).view(b, c, 1).contiguous()
+        return x * xt.expand_as(x)
+
 class Conv(nn.Module):
     """
     Convolution Module
