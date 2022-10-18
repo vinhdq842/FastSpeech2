@@ -147,7 +147,7 @@ def main(args, configs):
                     outer_bar.write(message)
 
                     model.train()
-
+                    """
                     if loss[0] <= val_loss:
                         val_loss = loss[0]
                         torch.save(
@@ -162,6 +162,8 @@ def main(args, configs):
                         )
                         outer_bar.write("Checkpoint saved at step %d" % step)
 
+                    """
+                    
 
 
                 if step % save_step == 0:

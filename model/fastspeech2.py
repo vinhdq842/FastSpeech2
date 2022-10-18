@@ -105,21 +105,17 @@ class FastSpeech2(nn.Module):
         )
 
         output = self.encoder(texts, src_masks)
-
+        
         if self.speaker_emb is not None:
-            output = torch.cat([output, self.speaker_emb(speakers).unsqueeze(1).expand(-1, max_src_len, -1)], dim=-1)
-            output = self.spk_prj(output)
+            output = output + self.speaker_emb(speakers).unsqueeze(1).expand(
+                -1, max_src_len, -1
+            )
 
         if self.emotion_emb is not None:
-            output = output + torch.tanh(self.emo_prj(self.emotion_emb(emotions))).unsqueeze(1).expand(
-                -1, max_src_len, -1)
+            output = output + self.emotion_emb(emotions).unsqueeze(1).expand(
+                -1, max_src_len, -1
+            )
 
-        output2 = self.pre_conv(output.transpose(1, 2))
-        output2 = self.se_block(output2)
-        output2 = self.post_lin(output2.transpose(1, 2))
-        output2 = self.post_conv(output2.transpose(1, 2))
-
-        output = output + output2.transpose(1, 2)
 
         (
             output,

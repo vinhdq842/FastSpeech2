@@ -33,8 +33,8 @@ multi_speaker: True
 multi_emotion: True
 
 speaker_emotion:
-  speaker_embedding_size: 128
-  emotion_embedding_size: 128
+  speaker_embedding_size: 256
+  emotion_embedding_size: 256
 
 max_seq_len: 1000
 
