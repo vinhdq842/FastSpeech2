@@ -142,12 +142,7 @@ def main(args, configs):
                 if step % val_step == 0:
                     model.eval()
                     message, loss = evaluate(model, step, configs, val_logger, vocoder)
-                    with open(os.path.join(val_log_path, "log.txt"), "a") as f:
-                        f.write(message + "\n")
-                    outer_bar.write(message)
-
-                    model.train()
-
+                    """
                     if loss[0] <= val_loss:
                         val_loss = loss[0]
                         torch.save(
@@ -162,6 +157,12 @@ def main(args, configs):
                         )
                         outer_bar.write("Checkpoint saved at step %d" % step)
 
+                    """
+                    with open(os.path.join(val_log_path, "log.txt"), "a") as f:
+                        f.write(message + "\n")
+                    outer_bar.write(message)
+
+                    model.train()
 
 
                 if step % save_step == 0:

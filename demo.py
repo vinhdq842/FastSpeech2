@@ -14,7 +14,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 st.header("Demo emotional TTS")
 text = st.text_input("Enter your text here")
-restore_step = st.slider("Select checkpoint",1000,40000,step=1000)
+restore_step = 11000#st.slider("Select checkpoint",1000,40000,step=1000)
 
 if st.button("Submit"):
     path_to_config = "config/VLSP-subtask1"
