@@ -115,6 +115,32 @@ def synthesize2(model,configs,vocoder,batchs,control_values,path):
 
     return results
 
+def synthesize_api(device,model,configs,vocoder,batchs,control_values,path):
+    preprocess_config, model_config, train_config = configs
+    pitch_control, energy_control, duration_control = control_values
+    for batch in batchs:
+        batch = to_device(batch, device)
+        with torch.no_grad():
+            # Forward
+            output = model(
+                *(batch[2:]),
+                p_control=pitch_control,
+                e_control=energy_control,
+                d_control=duration_control
+            )
+            
+        mel_predictions = output[1].transpose(1, 2)
+        lengths = output[9] * preprocess_config["preprocessing"]["stft"]["hop_length"]
+        wav_predictions = vocoder_infer(
+            mel_predictions, vocoder, model_config, preprocess_config, lengths=lengths
+        )
+
+        sampling_rate = preprocess_config["preprocessing"]["audio"]["sampling_rate"]
+
+        wav = wav_predictions[0]
+        wavfile.write(path, sampling_rate, wav)
+
+
 def synthesize(model, step, configs, vocoder, batchs, control_values):
     preprocess_config, model_config, train_config = configs
     pitch_control, energy_control, duration_control = control_values

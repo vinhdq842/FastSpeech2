@@ -11,7 +11,7 @@ import torch.nn.functional as F
 
 from utils.tools import get_mask_from_lengths, pad
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = "cpu" # torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class VarianceAdaptor(nn.Module):
