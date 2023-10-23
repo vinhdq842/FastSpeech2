@@ -119,3 +119,4 @@ hifigan/*.pth.tar
 demo_output/*.wav
 preprocessed_data
 .idea
+api-output/
