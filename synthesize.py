@@ -1,22 +1,22 @@
+import argparse
 import os
 import re
-import argparse
-from string import punctuation
 import time
+from string import punctuation
 
+import numpy as np
 import torch
 import yaml
-import numpy as np
+from scipy.io import wavfile
 from torch.utils.data import DataLoader
+from unidecode import unidecode
 
-from utils.model import get_model, get_vocoder, vocoder_infer
-from utils.tools import to_device, synth_samples
 from dataset import TextDataset
 from text import text_to_sequence
-from unidecode import unidecode
-from scipy.io import wavfile
+from utils.model import get_model, get_vocoder, vocoder_infer
+from utils.tools import to_device, synth_samples
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = "cpu"
 
 
 def read_lexicon(lex_path):
@@ -36,23 +36,23 @@ def preprocess_vietnamese(text, preprocess_config):
     lexicon = read_lexicon(preprocess_config["path"]["lexicon_path"])
 
     phones = []
-    words = list(filter(lambda x : len(x.strip()) > 0,re.split(r"([,;.\-\?\!\s+])", text)))
-    comb = ["ch","gh","gi","kh","ng","ngh","nh","th","tr","qu"]
+    words = list(filter(lambda x: len(x.strip()) > 0, re.split(r"([,;.\-\?\!\s+])", text)))
+    comb = ["ch", "gh", "gi", "kh", "ng", "ngh", "nh", "th", "tr", "qu"]
 
     for w in words:
         w = w.lower()
         if w in lexicon:
             phones += lexicon[w]
         else:
-            can:bool = True
+            can: bool = True
 
             for c in w:
                 can = can and c in lexicon
-            
+
             if not can:
                 continue
-            
-            if unidecode(w[0]) in ["u","e","o","a","i"]:
+
+            if unidecode(w[0]) in ["u", "e", "o", "a", "i"]:
                 phones += lexicon[w[0]]
                 w = w[len(w[0]):]
             else:
@@ -63,12 +63,11 @@ def preprocess_vietnamese(text, preprocess_config):
                             w = w[len(cb):]
                             break
                     else:
-                        if unidecode(w[0]) in ["u","e","o","a","i"]:
+                        if unidecode(w[0]) in ["u", "e", "o", "a", "i"]:
                             phones += lexicon[w[0]][1:]
                         else:
                             phones += lexicon[w[0]][0]
                         w = w[len(w[0]):]
-
 
     phones = "{" + "}{".join(phones) + "}"
     phones = re.sub(r"\{[^\w\s]?\}", "{sp}", phones)
@@ -84,7 +83,8 @@ def preprocess_vietnamese(text, preprocess_config):
 
     return np.array(sequence)
 
-def synthesize2(model,configs,vocoder,batchs,control_values,path):
+
+def synthesize2(model, configs, vocoder, batchs, control_values, path):
     preprocess_config, model_config, train_config = configs
     pitch_control, energy_control, duration_control = control_values
     results = []
@@ -99,7 +99,7 @@ def synthesize2(model,configs,vocoder,batchs,control_values,path):
                 e_control=energy_control,
                 d_control=duration_control
             )
-            
+
         mel_predictions = output[1].transpose(1, 2)
         lengths = output[9] * preprocess_config["preprocessing"]["stft"]["hop_length"]
         wav_predictions = vocoder_infer(
@@ -109,13 +109,14 @@ def synthesize2(model,configs,vocoder,batchs,control_values,path):
         sampling_rate = preprocess_config["preprocessing"]["audio"]["sampling_rate"]
 
         for wav in wav_predictions:
-            name = os.path.join(path,str(time.time()*1000).split('.')[0] + ".wav")
+            name = os.path.join(path, str(time.time() * 1000).split('.')[0] + ".wav")
             results.append(name)
             wavfile.write(name, sampling_rate, wav)
 
     return results
 
-def synthesize_api(device,model,configs,vocoder,batchs,control_values,path):
+
+def synthesize_api(device, model, configs, vocoder, batchs, control_values, path):
     preprocess_config, model_config, train_config = configs
     pitch_control, energy_control, duration_control = control_values
     for batch in batchs:
@@ -128,7 +129,7 @@ def synthesize_api(device,model,configs,vocoder,batchs,control_values,path):
                 e_control=energy_control,
                 d_control=duration_control
             )
-            
+
         mel_predictions = output[1].transpose(1, 2)
         lengths = output[9] * preprocess_config["preprocessing"]["stft"]["hop_length"]
         wav_predictions = vocoder_infer(
@@ -257,7 +258,7 @@ if __name__ == "__main__":
     if args.mode == "batch":
         # Get dataset
         dataset = TextDataset(args.source, preprocess_config)
-        batchs = DataLoader(
+        batches = DataLoader(
             dataset,
             batch_size=8,
             collate_fn=dataset.collate_fn,
@@ -269,8 +270,8 @@ if __name__ == "__main__":
         if preprocess_config["preprocessing"]["text"]["language"] == "vi":
             texts = np.array([preprocess_vietnamese(args.text, preprocess_config)])
         text_lens = np.array([len(texts[0])])
-        batchs = [(ids, raw_texts, speakers,emotions, texts, text_lens, max(text_lens))]
+        batches = [(ids, raw_texts, speakers, emotions, texts, text_lens, max(text_lens))]
 
     control_values = args.pitch_control, args.energy_control, args.duration_control
 
-    synthesize(model, args.restore_step, configs, vocoder, batchs, control_values)
+    synthesize(model, args.restore_step, configs, vocoder, batches, control_values)
